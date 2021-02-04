@@ -10,10 +10,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Build Pocker-Server App
+      - name: Build Poker-Server App
         run: yarn && yarn build
       - uses: akhileshns/heroku-deploy@v3.9.9
         with:
           heroku_api_key: ${{ secrets.HEROKU_API_TOKEN }}
           heroku_app_name: ${{ secrets.HEROKU_APP_NAME }}
+          heroku_email: 'rabingaire20@gmail.com'
           branch: 'main'
