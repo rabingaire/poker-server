@@ -12,8 +12,8 @@ jobs:
       - uses: actions/checkout@v2
       - name: Build Pocker-Server App
         run: yarn && yarn build
-      - name: Deploy to Heroku
-        env:
-          HEROKU_API_TOKEN: ${{ secrets.HEROKU_API_TOKEN }}
-          HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME }}
-        run: git push -f https://heroku:$HEROKU_API_TOKEN@git.heroku.com/$HEROKU_APP_NAME.git main:master
+      - uses: akhileshns/heroku-deploy@v3.9.9
+        with:
+          heroku_api_key: ${{ secrets.HEROKU_API_TOKEN }}
+          heroku_app_name: ${{ secrets.HEROKU_APP_NAME }}
+          branch: 'main'
