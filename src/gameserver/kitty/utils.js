@@ -1,14 +1,4 @@
-/**
- * Returns the strength of 3 card combination.
- * The array should be non-empty with three cards only.
- *
- * @param {Array} cardsArray
- */
-export function getCardStrength(cardsArray) {
-  if (!Array.isArray(cardsArray) && cardsArray.length !== 3) {
-    throw new Error('Invalid input array');
-  }
-}
+import { TRIAL, DOUBLE_RUN, RUN, COLOR, JUTE, HIGH_CARD } from './constants';
 
 /**
  * Returns true if the three cards is a trial.
@@ -56,6 +46,23 @@ export function sortDeck(cardsArray) {
   return sorted;
 }
 
+/**
+ * Returns the strongest card suit from the array.
+ * The array is assumed to be sorted.
+ * The original array is unchanged.
+ * 
+ * @param {Array} sortedArray
+ */
+export function getCardsForUser(sortedArray) {
+  const first = getStrongestCardGroup(sortedArray);
+  // create new array removing first
+  let newArray = []; // 6
+  const second = getStrongestCardGroup(newArray);
+  // create new array removing second
+  let newNewArray = []; // 6
+  const third = getStrongestCardGroup(newArray);
+}
+
 
 /**
  * Returns the strongest card suit from the array.
@@ -72,24 +79,64 @@ export function getStrongestCardGroup(sortedArray) {
   const highestTrials = getTrials(sortedArray);
 
   if(highestTrials) {
-    return highestTrials;
+    return {
+      type: TRIAL,
+      cards: highestTrials,
+    }
   }  
   // double run
   const doubleRuns = getDoubleRuns(sortedArray);
 
   if(doubleRuns) {
-    return doubleRuns;
+    return {
+      type: DOUBLE_RUN,
+      cards: doubleRuns,
+    }
   }
   // run
   const runs = getRun(sortedArray);
 
   if(runs) {
-    return runs;
+    return {
+      type: RUN,
+      cards: runs,
+    }
   }
   // color
-  // const colorSort = 
-  
-  return sortedArray;
+  const highestColor = getHighestColor(sortedArray);
+
+  if(highestColor) {
+    return {
+      type: COLOR,
+      cards: highestColor,
+    }
+  }
+  // jute
+  const highestJute = getHighestJute(sortedArray);
+
+  if(highestJute) {
+    return {
+      type: JUTE,
+      cards: highestJute,
+    }
+  }
+
+  const highCard = getHighestHighCard(sortedArray);
+
+  return {
+    type: HIGH_CARD,
+    cards: highCard,
+  }
+}
+
+
+/**
+ * Returns sorted array for color checking.
+ * 
+ * @param {Array} sortedArray
+ */
+export function getHighestHighCard(sortedArray) {
+  return sortedArray.slice(0, 3);
 }
 
 /**
@@ -114,7 +161,7 @@ export function getHighestJute(sortedArray) {
   const discardPile = [];
   let maxJutePrecedence = 1; // this is for card with 2 as its face
   let maxJuteKey = '2';
-
+  let hasJutes = false;
   // test if we have jutes
   const jutes = {};
 
@@ -123,25 +170,31 @@ export function getHighestJute(sortedArray) {
     if(value.length > 1) {
       // this is jute
       jutes[[key]] = value;
-      if(value[0].precedence > maxJutePrecedence) {
+      if(value[0].precedence >= maxJutePrecedence) {
         maxJutePrecedence = value[0].precedence;
         maxJuteKey = value[0].denomination;
+        hasJutes = true;
+      } else {
+        // todo jutes shouldn't be discarded as it will cause issue if taken as extra card
+        // happens for 6 cards of all jutes
+        // if the jute is smallest it will be discarded
+        discardPile.push(...value)
       }
     } else {
       // this is single card
       discardPile.push(value[0]);
     }
   }
+  // sort discard pile
+  const sortedDiscardPile = sortDeck(discardPile);
 
-  
+  if(hasJutes) {
+   const extraCard = sortedDiscardPile[sortedDiscardPile.length - 1];
 
-  // segregrate result to jutes and discard pile
+   return [...jutes[[maxJuteKey]], extraCard];
+  }
 
-  // if discard pile is empty take the lowest jute as the third card
-
-  
-
-
+  return null;
 }
 
 /**
@@ -180,6 +233,8 @@ export function getHighestColor(sortedArray) {
   const result = sortByColorAndPrecedence(sortedArray);
   const validColors = [];
 
+  // todo fixme 6 cards of same suit // exception
+
   // ensures that highest 3 elements are taken
   if(result.spade.length >= 3) {
     validColors.push(result.spade.slice(0, 3));
@@ -205,6 +260,7 @@ export function getHighestColor(sortedArray) {
   // weighting algorithm
   // every subsequent multiplication needs to be by order of 100 to avoid complicated loops
   // gives correct results for colors of A, 2, 4 and K, Q, 10
+
   const weights = validColors.map(color => {
     return color[0].precedence * 10000 + color[1].precedence * 100 + color[2].precedence;
   });
