@@ -4,7 +4,7 @@
     "node": true,
     "mocha": true
   },
-  "extends": ["eslint-config-leapfrog", "prettier"],
+  "extends": ["prettier"],
   "parserOptions": {
     "ecmaVersion": 2018,
     "sourceType": "module"

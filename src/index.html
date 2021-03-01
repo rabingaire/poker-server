@@ -89,6 +89,15 @@
       messages.appendChild(item);
       window.scrollTo(0, document.body.scrollHeight);
     });
+    socket.on('EVENT_ADD_PLAYER', function (data) {
+      console.log('EVENT_ADD_PLAYER', data);
+    });
+    socket.on('EVENT_TIME_CHANGE', function (data) {
+      console.log('EVENT_TIME_CHANGE', data);
+    });
+    socket.on('EVENT_GAME_START', function (data) {
+      console.log('EVENT_GAME_START', data);
+    });
   </script>
 </body>
 
