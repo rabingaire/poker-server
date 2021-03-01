@@ -1,4 +1,23 @@
 import { TRIAL, DOUBLE_RUN, RUN, COLOR, JUTE, HIGH_CARD } from './constants';
+import { DECK } from './deck';
+
+export function getUserAndSingleBotCard() {
+  let deck = shuffle(DECK);
+  const userCards = [];
+  const botCards = [];
+  for (let i = 0; i < 2 * 9; i++) {
+    if (i % 2 === 0) {
+      userCards.push(deck[i]);
+    } else {
+      botCards.push(deck[i]);
+    }
+  }
+
+  return {
+    you: userCards,
+    bot: getCardsForUser(botCards),
+  };
+}
 
 /**
  * Returns true if the three cards is a trial.
@@ -75,7 +94,7 @@ export function getCardsForUser(orgArray) {
   const secondArray = removeArray(orgArray, first.cards);
   const second = getStrongestCardGroup(secondArray);
 
-  const thirdArray = removeArray(orgArray, second.cards);
+  const thirdArray = removeArray(secondArray, second.cards);
   const third = getStrongestCardGroup(thirdArray);
 
   return [first, second, third];

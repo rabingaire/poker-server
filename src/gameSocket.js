@@ -1,12 +1,15 @@
+import { getUserAndSingleBotCard } from './gameserver/kitty/utils';
+
 let users = [];
 let gameStarted = false;
 
 const MAX_PLAYERS = 4;
-const MAX_TIME = 10; // IN SECONDS
+const MAX_TIME = 3; // IN SECONDS
 
 const EVENT_PLAYER_NUMBER_CHANGE = 'EVENT_ADD_PLAYER';
 const EVENT_TIME_CHANGE = 'EVENT_TIME_CHANGE';
 const EVENT_GAME_START = 'EVENT_GAME_START';
+const EVENT_CARDS_DEALT = 'EVENT_CARDS_DEALT';
 
 /**
  * Socket object.
@@ -60,6 +63,9 @@ function startGameWaitingTimer(io) {
 
 function startGame(io) {
   io.emit(EVENT_GAME_START, { message: 'Game Started' });
+  // fetch the game cards for a player
+  const gameData = getUserAndSingleBotCard();
+  io.emit(EVENT_CARDS_DEALT, gameData);
 }
 
 /**
