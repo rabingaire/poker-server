@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 
-import { isTrial, shuffle, sortDeck, getTrials, getDoubleRuns, getRun } from '../../../src/gameserver/kitty/utils';
+import { isTrial, shuffle, getTrials, getDoubleRuns, getRun, removeArray } from '../../../src/gameserver/kitty/utils';
 
 /**
  * Tests for '/api/users'
@@ -39,7 +39,7 @@ describe('Users Controller Test', () => {
   });
 
   it('should return true if the denomination is not same', () => {
-    const deck = [0,1,2,3,4,5,6,7,8,9];
+    const deck = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 
     expect(shuffle(deck)).not.to.be.equal(deck);
   });
@@ -117,7 +117,7 @@ describe('Users Controller Test', () => {
       },
     ];
     const actual = getTrials(deck);
-    
+
     expect(actual).to.eql(expected);
   });
   it('double run test', () => {
@@ -126,35 +126,35 @@ describe('Users Controller Test', () => {
         denomination: 'A',
         precedence: 13,
         suit: {
-          name: "heart",
+          name: 'heart',
         },
       },
       {
         denomination: 'K',
         precedence: 12,
         suit: {
-          name: "club",
+          name: 'club',
         },
       },
       {
         denomination: 'Q',
         precedence: 11,
         suit: {
-          name: "club",
+          name: 'club',
         },
       },
       {
         denomination: 'J',
         precedence: 10,
         suit: {
-          name: "club",
+          name: 'club',
         },
       },
       {
         denomination: '10',
         precedence: 9,
         suit: {
-          name: "heart",
+          name: 'heart',
         },
       },
     ];
@@ -164,21 +164,21 @@ describe('Users Controller Test', () => {
         denomination: 'K',
         precedence: 12,
         suit: {
-          name: "club",
+          name: 'club',
         },
       },
       {
         denomination: 'Q',
         precedence: 11,
         suit: {
-          name: "club",
+          name: 'club',
         },
       },
       {
         denomination: 'J',
         precedence: 10,
         suit: {
-          name: "club",
+          name: 'club',
         },
       },
     ];
@@ -234,7 +234,15 @@ describe('Users Controller Test', () => {
       },
     ];
     const actual = getRun(deck);
-    
+
+    expect(actual).to.eql(expected);
+  });
+  it('remove array test', () => {
+    const deck = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+    const expected = [1, 2, 3, 7, 8, 9];
+    const actual = removeArray(deck, [4, 5, 6]);
+
     expect(actual).to.eql(expected);
   });
 });

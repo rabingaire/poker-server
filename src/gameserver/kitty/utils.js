@@ -16,13 +16,13 @@ export function isTrial(cardsArray) {
  * Returns shuffled deck.
  * The original array is unchanged.
  * // https://stackoverflow.com/questions/40057647/what-is-the-best-algorithm-to-shuffle-cards.
- * 
+ *
  * @param {Array} cardsArray
  */
 export function shuffle(cardsArray) {
   const shuffeledDeck = [...cardsArray];
 
-  for(let i = cardsArray.length - 1; i >= 0; i--) {
+  for (let i = cardsArray.length - 1; i >= 0; i--) {
     const j = Math.floor(Math.random() * i) + 1;
 
     const temp = shuffeledDeck[j];
@@ -37,7 +37,7 @@ export function shuffle(cardsArray) {
 /**
  * Returns sorted deck.
  * The original array is unchanged.
- * 
+ *
  * @param {Array} cardsArray
  */
 export function sortDeck(cardsArray) {
@@ -50,75 +50,89 @@ export function sortDeck(cardsArray) {
  * Returns the strongest card suit from the array.
  * The array is assumed to be sorted.
  * The original array is unchanged.
- * 
- * @param {Array} sortedArray
+ *
+ * @param {Array} arr1
+ * @param {Array} arr2
  */
-export function getCardsForUser(sortedArray) {
-  const first = getStrongestCardGroup(sortedArray);
-  // create new array removing first
-  let newArray = []; // 6
-  const second = getStrongestCardGroup(newArray);
-  // create new array removing second
-  let newNewArray = []; // 6
-  const third = getStrongestCardGroup(newArray);
-}
+export function removeArray(arr1, arr2) {
+  const result = arr1.filter((item) => {
+    return !arr2.includes(item);
+  });
 
+  return result;
+}
 
 /**
  * Returns the strongest card suit from the array.
  * The array is assumed to be sorted.
  * The original array is unchanged.
- * 
+ *
+ * @param {Array} orgArray
+ */
+export function getCardsForUser(orgArray) {
+  const first = getStrongestCardGroup(orgArray);
+
+  const secondArray = removeArray(orgArray, first.cards);
+  const second = getStrongestCardGroup(secondArray);
+
+  const thirdArray = removeArray(orgArray, second.cards);
+  const third = getStrongestCardGroup(thirdArray);
+
+  return [first, second, third];
+}
+
+/**
+ * Returns the strongest card suit from the array.
+ * The array is assumed to be sorted.
+ * The original array is unchanged.
+ *
  * @param {Array} sortedArray
  */
 export function getStrongestCardGroup(sortedArray) {
-  if(sortedArray.length === 3) {
-    return sortedArray;
-  }
   // trials
   const highestTrials = getTrials(sortedArray);
 
-  if(highestTrials) {
+  if (highestTrials) {
     return {
       type: TRIAL,
       cards: highestTrials,
-    }
-  }  
+    };
+  }
   // double run
   const doubleRuns = getDoubleRuns(sortedArray);
 
-  if(doubleRuns) {
+  if (doubleRuns) {
     return {
       type: DOUBLE_RUN,
       cards: doubleRuns,
-    }
+    };
   }
   // run
   const runs = getRun(sortedArray);
 
-  if(runs) {
+  if (runs) {
     return {
       type: RUN,
       cards: runs,
-    }
+    };
   }
   // color
   const highestColor = getHighestColor(sortedArray);
 
-  if(highestColor) {
+  if (highestColor) {
     return {
       type: COLOR,
       cards: highestColor,
-    }
+    };
   }
   // jute
   const highestJute = getHighestJute(sortedArray);
 
-  if(highestJute) {
+  if (highestJute) {
     return {
       type: JUTE,
       cards: highestJute,
-    }
+    };
   }
 
   const highCard = getHighestHighCard(sortedArray);
@@ -126,13 +140,12 @@ export function getStrongestCardGroup(sortedArray) {
   return {
     type: HIGH_CARD,
     cards: highCard,
-  }
+  };
 }
-
 
 /**
  * Returns sorted array for color checking.
- * 
+ *
  * @param {Array} sortedArray
  */
 export function getHighestHighCard(sortedArray) {
@@ -141,17 +154,17 @@ export function getHighestHighCard(sortedArray) {
 
 /**
  * Returns sorted array for color checking.
- * 
+ *
  * @param {Array} sortedArray
  */
 export function getHighestJute(sortedArray) {
   const result = {};
 
   // segregrate cards by denomination
-  sortedArray.forEach(item => {
+  sortedArray.forEach((item) => {
     const { denomination } = item;
 
-    if(result[[denomination]]) {
+    if (result[[denomination]]) {
       result[[denomination]].push(item);
     } else {
       result[[denomination]] = [item];
@@ -166,11 +179,10 @@ export function getHighestJute(sortedArray) {
   const jutes = {};
 
   for (const [key, value] of Object.entries(result)) {
-
-    if(value.length > 1) {
+    if (value.length > 1) {
       // this is jute
       jutes[[key]] = value;
-      if(value[0].precedence >= maxJutePrecedence) {
+      if (value[0].precedence >= maxJutePrecedence) {
         maxJutePrecedence = value[0].precedence;
         maxJuteKey = value[0].denomination;
         hasJutes = true;
@@ -178,7 +190,7 @@ export function getHighestJute(sortedArray) {
         // todo jutes shouldn't be discarded as it will cause issue if taken as extra card
         // happens for 6 cards of all jutes
         // if the jute is smallest it will be discarded
-        discardPile.push(...value)
+        discardPile.push(...value);
       }
     } else {
       // this is single card
@@ -188,10 +200,10 @@ export function getHighestJute(sortedArray) {
   // sort discard pile
   const sortedDiscardPile = sortDeck(discardPile);
 
-  if(hasJutes) {
-   const extraCard = sortedDiscardPile[sortedDiscardPile.length - 1];
+  if (hasJutes) {
+    const extraCard = sortedDiscardPile[sortedDiscardPile.length - 1];
 
-   return [...jutes[[maxJuteKey]], extraCard];
+    return [...jutes[[maxJuteKey]], extraCard];
   }
 
   return null;
@@ -199,7 +211,7 @@ export function getHighestJute(sortedArray) {
 
 /**
  * Returns sorted array for color checking.
- * 
+ *
  * @param {Array} sortedArray
  */
 export function sortByColorAndPrecedence(sortedArray) {
@@ -208,10 +220,12 @@ export function sortByColorAndPrecedence(sortedArray) {
     club: [],
     diamond: [],
     heart: [],
-  }
+  };
 
-  sortedArray.forEach(item => {
-    const { suit : { name }} = item;
+  sortedArray.forEach((item) => {
+    const {
+      suit: { name },
+    } = item;
 
     result[[name]].push(item);
   });
@@ -220,13 +234,13 @@ export function sortByColorAndPrecedence(sortedArray) {
   result.club = sortDeck(result.club);
   result.diamond = sortDeck(result.diamond);
   result.heart = sortDeck(result.heart);
-  
+
   return result;
 }
 
 /**
  * Returns sorted array for color checking.
- * 
+ *
  * @param {Array} sortedArray
  */
 export function getHighestColor(sortedArray) {
@@ -236,32 +250,32 @@ export function getHighestColor(sortedArray) {
   // todo fixme 6 cards of same suit // exception
 
   // ensures that highest 3 elements are taken
-  if(result.spade.length >= 3) {
+  if (result.spade.length >= 3) {
     validColors.push(result.spade.slice(0, 3));
   }
-  if(result.club.length >= 3) {
+  if (result.club.length >= 3) {
     validColors.push(result.club.slice(0, 3));
   }
-  if(result.diamond.length >= 3) {
+  if (result.diamond.length >= 3) {
     validColors.push(result.diamond.slice(0, 3));
   }
-  if(result.heart.length >= 3) {
+  if (result.heart.length >= 3) {
     validColors.push(result.heart.slice(0, 3));
   }
   // basic checks
-  if(validColors.length === 0) {
+  if (validColors.length === 0) {
     return null;
   }
-  
-  if(validColors.length === 1) {
+
+  if (validColors.length === 1) {
     return validColors[0];
   }
-  
+
   // weighting algorithm
   // every subsequent multiplication needs to be by order of 100 to avoid complicated loops
   // gives correct results for colors of A, 2, 4 and K, Q, 10
 
-  const weights = validColors.map(color => {
+  const weights = validColors.map((color) => {
     return color[0].precedence * 10000 + color[1].precedence * 100 + color[2].precedence;
   });
 
@@ -276,11 +290,11 @@ export function getHighestColor(sortedArray) {
  * Returns trial if exists else null.
  * The array is assumed to be sorted.
  * The original array is unchanged.
- * 
+ *
  * @param {Array} sortedArray
  */
 export function getTrials(sortedArray) {
-  for(let i = 2; i <= sortedArray.length; i++) {
+  for (let i = 2; i <= sortedArray.length; i++) {
     const a = sortedArray[i - 2];
     const b = sortedArray[i - 1];
     const c = sortedArray[i];
@@ -289,7 +303,7 @@ export function getTrials(sortedArray) {
       return [a, b, c];
     }
   }
-  
+
   return null;
 }
 
@@ -297,22 +311,22 @@ export function getTrials(sortedArray) {
  * Returns trial if exists else null.
  * The array is assumed to be sorted.
  * The original array is unchanged.
- * 
+ *
  * @param {Array} sortedArray
  */
 export function getDoubleRuns(sortedArray) {
-  for(let i = 2; i <= sortedArray.length; i++) {
+  for (let i = 2; i <= sortedArray.length; i++) {
     const a = sortedArray[i - 2];
     const b = sortedArray[i - 1];
     const c = sortedArray[i];
 
     // check run
-    if(b.precedence + 1 !== a.precedence || b.precedence -1 !== c.precedence) {
+    if (b.precedence + 1 !== a.precedence || b.precedence - 1 !== c.precedence) {
       continue;
     }
 
     // check suit
-    if(b.suit.name !== a.suit.name || b.suit.name !== c.suit.name) {
+    if (b.suit.name !== a.suit.name || b.suit.name !== c.suit.name) {
       continue;
     }
 
@@ -326,22 +340,22 @@ export function getDoubleRuns(sortedArray) {
  * Returns trial if exists else null.
  * The array is assumed to be sorted.
  * The original array is unchanged.
- * 
+ *
  * @param {Array} sortedArray
  */
 export function getRun(sortedArray) {
-  for(let i = 2; i <= sortedArray.length; i++) {
+  for (let i = 2; i <= sortedArray.length; i++) {
     const a = sortedArray[i - 2];
     const b = sortedArray[i - 1];
     const c = sortedArray[i];
 
     // check run
-    if(b.precedence + 1 !== a.precedence || b.precedence -1 !== c.precedence) {
+    if (b.precedence + 1 !== a.precedence || b.precedence - 1 !== c.precedence) {
       continue;
     }
 
     return [a, b, c];
   }
-  
+
   return null;
 }
