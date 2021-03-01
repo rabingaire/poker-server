@@ -16,6 +16,9 @@ import routes from './routes';
 import json from './middlewares/json';
 import logger, { logStream } from './utils/logger';
 import * as errorHandler from './middlewares/errorHandler';
+import SocketIO from 'socket.io';
+import http from 'http';
+import gameSocket from './gameSocket';
 
 // Initialize Sentry
 // https://docs.sentry.io/platforms/node/express/
@@ -97,6 +100,15 @@ process.on('uncaughtException', err => {
   } finally {
     process.exit(1);
   }
+});
+
+const server = http.Server(app);
+const io = SocketIO(server, {path: "/game"});
+
+// io.on('connection', socket => gameSocket(socket));
+io.on('connection', socket => {
+  console.log('A user has connected', socket);
+  socket.emit("chat message", "Some thing to show");
 });
 
 export default app;

@@ -2,6 +2,7 @@ import { Router } from 'express';
 
 import swaggerSpec from './utils/swagger';
 import userRoutes from './routes/userRoutes';
+import gameRoutes from './gameRoutes'
 
 /**
  * Contains all API routes for the application.
@@ -26,5 +27,6 @@ router.get('/', (req, res) => {
 });
 
 router.use('/users', userRoutes);
+router.use('/game', gameRoutes)
 
 export default router;
