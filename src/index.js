@@ -2,15 +2,10 @@ import './env';
 import './db';
 
 import express from 'express';
-import * as Sentry from '@sentry/node';
-
-import routes from './routes';
 import SocketIO from 'socket.io';
 import http from 'http';
+import gameSocket from './gameSocket';
 
-// Initialize Sentry
-// https://docs.sentry.io/platforms/node/express/
-Sentry.init({ dsn: process.env.SENTRY_DSN });
 
 const app = express();
 
@@ -29,11 +24,7 @@ const server = http.Server(app);
 
 const io = SocketIO(server);
 
-io.on('connection', (socket) => {
-  socket.on('chat message', msg => {
-    io.emit('chat message', msg);
-  });
-});
+io.on('connection', (socket) => gameSocket(socket, io));
 
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
