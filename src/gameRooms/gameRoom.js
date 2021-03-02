@@ -3,7 +3,7 @@ import { getUserAndSingleBotCard } from '../gameserver/kitty/utils';
 const USERS_PER_ROOM = 3;
 
 // ALL TIME ARE IN SECONDS
-const MULTI_PLAYER_USER_WAIT_TIME = 5;
+const MULTI_PLAYER_USER_WAIT_TIME = 15;
 const USER_CARD_PREPARATION_TIME = 15;
 const NEXT_SET_TIME = 10; // THIS TIME IS FOR USERS TO LOOK AT THEIR HAND AND WINNING HAND
 
@@ -11,7 +11,6 @@ const NAMESPACES = '/'; // this is the default namespace
 
 const SERVER_EVENTS = {
   NEW_USER_ADD: 'NEW_USER_ADD',
-  USER_DISCONNECTED: 'USER_DISCONNECTED',
   GAME_ALREADY_STARTED: 'GAME_ALREADY_STARTED',
   GAME_TIMER_START: 'GAME_TIMER_START',
   GAME_TIMER_END: 'GAME_TIMER_END',
@@ -44,6 +43,7 @@ const SOCKET_IO_ERROR_EVENTS = {
 
 let players = [];
 const rooms = new Map();
+
 const emptyRoomState = { gameStarted: false, users: [] };
 
 function getRoomWithAvailableSeats() {
@@ -92,6 +92,7 @@ function gameRoom(socket, io) {
   socket.join(roomName);
   addUserToRoom(roomName, user);
   fireNewUserAddedEvent(roomName, user, io);
+  startGameLoop(roomName, io);
 
   socket.on('disconnect', () => {
     // remove user management
@@ -108,14 +109,23 @@ function fireNewUserAddedEvent(roomName, user, io) {
 
 function startGameLoop(roomName, io) {
   console.log('game interval started');
-  let gameTime = MAX_TIME;
+  const roomData = rooms.get(roomName);
+  if (roomData.gameStarted) {
+    return;
+  }
+  // set room game timeline to started
+  const newRoomData = { ...roomData, ...{ gameStarted: true } };
+  rooms.set(roomName, newRoomData);
+
+  let gameTime = MULTI_PLAYER_USER_WAIT_TIME;
   const INTERVAL_DELTA = 1000;
   let intervalId = setInterval(() => {
-    io.emit(EVENT_TIME_CHANGE, { time: gameTime, total_no_of_players: users.length });
+    io.emit(SERVER_EVENTS.GAME_TIMER_START, { time: gameTime, room: newRoomData });
     gameTime = gameTime - 1;
     if (gameTime <= 0) {
       clearInterval(intervalId);
-      startGame(io);
+      // startGame(io);
+      io.emit(SERVER_EVENTS.GAME_TIMER_END, { time: gameTime, room: newRoomData });
     }
   }, INTERVAL_DELTA);
 }

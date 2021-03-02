@@ -83,45 +83,34 @@
         input.value = '';
       }
     });
-    const EVENTS = {
-      'NEW_USER_ADD': 'NEW_USER_ADD',
-      'USER_DISCONNECTED': 'USER_DISCONNECTED',
-      'GAME_TIMER_START': 'GAME_TIMER_START',
-      'GAME_TIMER_END': 'GAME_TIMER_END',
-      'CARD_DISTRIBUTION': 'CARD_DISTRIBUTION',
-      'CARD_PREPARATION_STARTED': 'CARD_PREPARATION_STARTED',
-      'CARD_PREPARATION_ENDED': 'CARD_PREPARATION_ENDED',
-      'FIRST_MOVE': 'FIRST_MOVE',
-      'SECOND_MOVE': 'SECOND_MOVE',
-      'THIRD_MOVE': 'THIRD_MOVE',
-      'GAME_ENDED': 'GAME_ENDED',
+    const SERVER_EVENTS = {
+      NEW_USER_ADD: 'NEW_USER_ADD',
+      USER_DISCONNECTED: 'USER_DISCONNECTED',
+      GAME_ALREADY_STARTED: 'GAME_ALREADY_STARTED',
+      GAME_TIMER_START: 'GAME_TIMER_START',
+      GAME_TIMER_END: 'GAME_TIMER_END',
+      CARD_DISTRIBUTION: 'CARD_DISTRIBUTION',
+      CARD_PREPARATION_STARTED: 'CARD_PREPARATION_STARTED',
+      CARD_PREPARATION_ENDED: 'CARD_PREPARATION_ENDED',
+      FIRST_MOVE: 'FIRST_MOVE',
+      FIRST_MOVE_WINNER: 'FIRST_MOVE_WINNER',
+      SECOND_MOVE: 'SECOND_MOVE',
+      SECOND_MOVE_WINNER: 'SECOND_MOVE_WINNER',
+      THIRD_MOVE: 'THIRD_MOVE',
+      THIRD_MOVE_WINNER: 'THIRD_MOVE_WINNER',
+      GAME_ENDED: 'GAME_ENDED',
+      GAME_WON_AS_ALL_USER_LEFT: 'GAME_WON_AS_ALL_USER_LEFT',
+      GAME_LOST_DUE_TO_IMPROPER_HAND: 'GAME_LOST_DUE_TO_IMPROPER_HAND',
     };
 
-    for(let key of Object.keys(EVENTS)) {
+    for (let key of Object.keys(SERVER_EVENTS)) {
       console.log(`Setting up: ${key}`);
       console.log('=============================================');
       socket.on(key, function (data) {
         console.log(key, data);
       });
     }
-    // socket.on('chat message', function (msg) {
-    //   var item = document.createElement('li');
-    //   item.textContent = msg;
-    //   messages.appendChild(item);
-    //   window.scrollTo(0, document.body.scrollHeight);
-    // });
-    // socket.on('EVENT_ADD_PLAYER', function (data) {
-    //   console.log('EVENT_ADD_PLAYER', data);
-    // });
-    // socket.on('EVENT_TIME_CHANGE', function (data) {
-    //   console.log('EVENT_TIME_CHANGE', data);
-    // });
-    // socket.on('EVENT_GAME_START', function (data) {
-    //   console.log('EVENT_GAME_START', data);
-    // });
-    // socket.on('EVENT_CARDS_DEALT', function (data) {
-    //   console.log('EVENT_CARDS_DEALT', data);
-    // });
+
   </script>
 </body>
 
